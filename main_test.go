@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,9 +15,9 @@ func TestMainHandlerWhenCorrectRequest(t *testing.T) {
 	count := 2
 	city := "moscow"
 	url := fmt.Sprintf("/cafe?count=%d&city=%s", count, city)
-	req := httptest.NewRequest("GET", url, nil)
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
-	expectedBody := "Мир кофе,Сладкоежка"
+	expectedBody := strings.Join(cafeList[city][:2], ",")
 
 	//WHEN
 	responseRecorder := serveHttpRequest(req)
@@ -33,9 +34,10 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	count := 5
 	city := "moscow"
 	url := fmt.Sprintf("/cafe?count=%d&city=%s", count, city)
-	req := httptest.NewRequest("GET", url, nil)
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
-	expectedBody := "Мир кофе,Сладкоежка,Кофе и завтраки,Сытый студент"
+	//expectedBody := "Мир кофе,Сладкоежка,Кофе и завтраки,Сытый студент"
+	expectedBody := strings.Join(cafeList[city][0:4], ",")
 
 	//WHEN
 	responseRecorder := serveHttpRequest(req)
@@ -52,7 +54,7 @@ func TestMainHandlerWhenUnsupportedCity(t *testing.T) {
 	count := 2
 	city := "nsk"
 	url := fmt.Sprintf("/cafe?count=%d&city=%s", count, city)
-	req := httptest.NewRequest("GET", url, nil)
+	req := httptest.NewRequest(http.MethodGet, url, nil)
 
 	expectedBody := "wrong city value"
 
